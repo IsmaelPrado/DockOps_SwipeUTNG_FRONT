@@ -10,6 +10,7 @@ export default function Profile() {
     career: storedUser.career || '',
     age: storedUser.age || '',
     gender: storedUser.gender || '',
+
     photos: storedUser.photos || ['', '', ''],
   });
 
@@ -38,6 +39,7 @@ export default function Profile() {
   const handleUpdate = (e) => {
     e.preventDefault();
     localStorage.setItem('user', JSON.stringify(formData));
+
     alert('✅ Perfil actualizado con éxito');
   };
 

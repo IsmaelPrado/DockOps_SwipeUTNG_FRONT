@@ -1,3 +1,4 @@
+
 // src/pages/Register.jsx
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -12,6 +13,7 @@ export default function Register() {
     age: '',
     gender: '',
     career: '',
+
     photos: ['', '', ''],
   });
 
@@ -115,6 +117,7 @@ export default function Register() {
 
     try {
       await registerUser(dataToSend);
+
       navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Error al registrar. Intenta nuevamente.');

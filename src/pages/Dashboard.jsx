@@ -1,3 +1,4 @@
+
 // src/pages/Dashboard.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +31,7 @@ const carreras = [
 
 export default function Dashboard() {
   const [filtro, setFiltro] = useState('');
+
   const navigate = useNavigate();
 
   const handleVerMas = (carrera) => {
