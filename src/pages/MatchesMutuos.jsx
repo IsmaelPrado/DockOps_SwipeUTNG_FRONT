@@ -3,6 +3,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../services/api';
 
 export default function MatchesMutuos() {
   const [matchesMutuos, setMatchesMutuos] = useState([]);
@@ -45,7 +46,7 @@ export default function MatchesMutuos() {
     const fetchMutualMatches = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/matches/mutual/${currentUserId}`);
+        const res = await axios.get(`${API_URL}/matches/mutual/${currentUserId}`);
         console.log('Matches recibidos:', res.data);
         setMatchesMutuos(res.data || []);
       } catch (error) {
@@ -61,7 +62,7 @@ export default function MatchesMutuos() {
   }, [currentUserId]);
 
   const handleIniciarChat = (matchedUserId) => {
-    navigate(`/chat/${matchedUserId}`);
+    navigate(`${API_URL}/chat/${matchedUserId}`);
   };
 
   const handleFilterChange = (e) => {

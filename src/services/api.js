@@ -5,6 +5,9 @@ const API = axios.create({
   baseURL: 'http://localhost:3001/api',
 });
 
+// Exportar URL
+export const API_URL = 'http://localhost:3001/api';
+
 export const registerUser = async (userData) => {
   try {
     const res = await API.post('/register', userData);
@@ -23,3 +26,4 @@ export const loginUser = async (credentials) => {
     throw err.response?.data || { message: 'Error al iniciar sesión' };
   }
 };
+

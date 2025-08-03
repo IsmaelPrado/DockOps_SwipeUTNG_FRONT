@@ -5,6 +5,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../services/api';
 
 export default function UsuariosPorCarrera() {
   const { nombreCarrera } = useParams();
@@ -34,7 +35,7 @@ export default function UsuariosPorCarrera() {
       if (!token) return;
 
       try {
-        const response = await axios.get('/api/auth/me', {
+        const response = await axios.get(`${API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCurrentUserId(response.data.id);
@@ -53,7 +54,7 @@ export default function UsuariosPorCarrera() {
       const token = localStorage.getItem('token');
       try {
         const response = await axios.get(
-          `/api/usuarios/carrera/${encodeURIComponent(decodedCarrera)}`,
+          `${API_URL}/usuarios/carrera/${encodeURIComponent(decodedCarrera)}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -80,7 +81,7 @@ export default function UsuariosPorCarrera() {
         return;
       }
       try {
-        const res = await axios.get(`/api/matches/mutual/${currentUserId}`);
+        const res = await axios.get(`${API_URL}/matches/mutual/${currentUserId}`);
         setMatchesMutuos(res.data || []);
       } catch (error) {
         console.error('Error al obtener matches mutuos:', error.response?.data || error.message);

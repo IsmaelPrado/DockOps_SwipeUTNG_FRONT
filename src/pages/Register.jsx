@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { registerUser } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -120,7 +121,9 @@ export default function Register() {
 
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Error al registrar. Intenta nuevamente.');
+      setError(err.errors[0] || err.message || 'Error al registrar. Intenta nuevamente.');
+      toast.error(err.message || 'Error al registrar. Intenta nuevamente.');
+      console.log(err.message);
     } finally {
       setLoading(false);
     }

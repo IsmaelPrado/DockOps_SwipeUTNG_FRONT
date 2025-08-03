@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { loginUser } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(['']);
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -21,11 +22,15 @@ export default function Login() {
       const res = await loginUser({ email, password });
       // Aquí acceso directo a res.token y res.user (no res.data)
       localStorage.setItem('token', res.token);
-      localStorage.setItem('user', JSON.stringify(res.user));
+      toast.success('Inicio de sesión exitoso');
       navigate('/dashboard');
     } catch (err) {
-      // err ya es el objeto con message
-      setError(err.message || 'Error al iniciar sesión');
+      console.error('Error al iniciar sesión:', err);
+      const message = err?.response?.data?.message || 'Error al iniciar sesión';
+      const errors = err?.response?.data?.errors || [];
+
+      setError(errors.length > 0 ? errors : message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

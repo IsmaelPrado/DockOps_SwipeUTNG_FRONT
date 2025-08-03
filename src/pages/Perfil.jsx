@@ -1,22 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
+import { API_URL } from '../services/api';
 
 export default function Profile() {
-  const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+  const token = localStorage.getItem('token');
   const [formData, setFormData] = useState({
-    name: storedUser.name || '',
-    email: storedUser.email || '',
-    career: storedUser.career || '',
-    age: storedUser.age || '',
-    gender: storedUser.gender || '',
-
-    photos: storedUser.photos || ['', '', ''],
+    name: '',
+    email: '',
+    career: '',
+    age: '',
+    gender: '',
+    photos: ['', '', ''],
   });
 
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(`${API_URL}/usuarios/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al obtener perfil de usuario');
+        }
+
+        const data = await response.json();
+        setFormData(data);
+        console.log('Perfil de usuario cargado:', data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [token]);
+
   const [photoPreviews, setPhotoPreviews] = useState(
-    storedUser.photos?.map((photo) => (photo ? photo : '')) || ['', '', '']
+    formData.photos?.map((photo) => (photo ? photo : '')) || ['', '', '']
   );
+
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;

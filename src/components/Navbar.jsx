@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCaretDown, FaBars, FaTimes } from 'react-icons/fa';
+import { API_URL } from '../services/api';
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -13,16 +14,35 @@ export default function Navbar() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    setIsLoggedIn(!!token);
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error('Error al parsear el usuario del localStorage');
-      }
+    if (token) {
+      setIsLoggedIn(true);
+      fetchUserProfile();
+    } else {
+      setIsLoggedIn(false);
+      setUser(null);
     }
   }, []);
+
+  const fetchUserProfile = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const response = await fetch(`${API_URL}/usuarios/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Error al obtener el perfil del usuario');
+      }
+      const data = await response.json();
+      setUser(data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      setUser(null);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -36,6 +56,8 @@ export default function Navbar() {
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  const photoBase64 = user?.photos?.[0] || user?.name?.charAt(0).toUpperCase() || 'U';
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50 transition-colors duration-300">
@@ -110,7 +132,11 @@ export default function Navbar() {
                 className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm cursor-pointer ring-2 ring-purple-200 dark:ring-purple-800"
                 onClick={toggleDropdown}
               >
-                {user.name?.charAt(0).toUpperCase() || 'U'}
+                {photoBase64 ? (
+                  <img src={photoBase64} alt="User Avatar" className="w-full h-full object-cover rounded-full" />
+                ) : (
+                  user.name?.charAt(0).toUpperCase() || 'U'
+                )}
               </div>
               <span
                 className="text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer"
