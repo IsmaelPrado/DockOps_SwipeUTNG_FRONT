@@ -23,7 +23,7 @@ export default function Login() {
       // Aquí acceso directo a res.token y res.user (no res.data)
       localStorage.setItem('token', res.token);
       toast.success('Inicio de sesión exitoso');
-      navigate('/dashboard');
+      navigate('/matches-mutual');
     } catch (err) {
       console.error('Error al iniciar sesión:', err);
       const message = err?.response?.data?.message || 'Error al iniciar sesión';

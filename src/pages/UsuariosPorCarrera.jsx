@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../services/api';
+import { toast } from 'react-toastify';
 
 export default function UsuariosPorCarrera() {
   const { nombreCarrera } = useParams();
@@ -27,6 +28,7 @@ export default function UsuariosPorCarrera() {
   });
 
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   // Obtener usuario actual
   useEffect(() => {
@@ -51,7 +53,6 @@ export default function UsuariosPorCarrera() {
   useEffect(() => {
     const fetchUsuarios = async () => {
       setLoadingUsuarios(true);
-      const token = localStorage.getItem('token');
       try {
         const response = await axios.get(
           `${API_URL}/usuarios/carrera/${encodeURIComponent(decodedCarrera)}`,
@@ -73,16 +74,22 @@ export default function UsuariosPorCarrera() {
 
   // Obtener matches mutuos para barra lateral
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setMatchesMutuos([]);
+      setLoadingMatches(false);
+      return;
+    }
     const fetchMutualMatches = async () => {
       setLoadingMatches(true);
-      if (!currentUserId) {
-        setMatchesMutuos([]);
-        setLoadingMatches(false);
-        return;
-      }
       try {
-        const res = await axios.get(`${API_URL}/matches/mutual/${currentUserId}`);
-        setMatchesMutuos(res.data || []);
+        const res = await axios.get(`${API_URL}/matches/mutual`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setMatchesMutuos(res.data.data || []);
       } catch (error) {
         console.error('Error al obtener matches mutuos:', error.response?.data || error.message);
         setMatchesMutuos([]);
@@ -92,33 +99,34 @@ export default function UsuariosPorCarrera() {
     };
 
     fetchMutualMatches();
-  }, [currentUserId]);
+  }, [token]);
 
   const handleMatch = async (matchedUserId) => {
-    if (!currentUserId) {
-      alert('Debes iniciar sesión para hacer match.');
+    if (!token) {
+      toast.error('Debes iniciar sesión para hacer match.');
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        '/api/matches',
+        `${API_URL}/swipe`,
         {
-          user_id: currentUserId,
-          matched_user_id: matchedUserId,
+          swiper_id: currentUserId,
+          swiped_id: matchedUserId,
+          is_like: true, // Asumimos que siempre es un like al hacer match
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alert('✅ ¡Match enviado! Espera a que también te matcheen.');
+      toast.success('✅ ¡Match enviado! Espera a que también te matcheen.');
       // Opcional: remover del listado o actualizar estado
       setUsuarios(prev => prev.filter(u => u.id !== matchedUserId));
       setSelectedUser(null);
     } catch (error) {
       console.error('Error al hacer match:', error);
-      alert('❌ No se pudo enviar el match. Intenta más tarde.');
+      toast.error('❌ No se pudo enviar el match. Intenta más tarde.');
     }
   };
 
