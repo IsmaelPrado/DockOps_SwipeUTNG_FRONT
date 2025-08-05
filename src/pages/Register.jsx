@@ -121,8 +121,12 @@ export default function Register() {
 
       navigate('/login');
     } catch (err) {
-      setError(err.errors[0] || err.message || 'Error al registrar. Intenta nuevamente.');
-      toast.error(err.message || 'Error al registrar. Intenta nuevamente.');
+      setError(
+        err?.errors?.[0] ||
+        err?.message ||
+        'Error al registrar. Intenta nuevamente.'
+      );  
+    toast.error(err.message || 'Error al registrar. Intenta nuevamente.');
       console.log(err.message);
     } finally {
       setLoading(false);

@@ -76,6 +76,13 @@ export default function Navbar() {
           <nav className="hidden md:flex space-x-8">
             {isLoggedIn ? (
               <>
+               <Link
+                  to="/matches-mutual"
+                  className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 font-medium transition duration-300 relative group"
+                >
+                   Swipes
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-all group-hover:w-full"></span>
+                </Link>
                 <Link
                   to="/dashboard"
                   className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 font-medium transition duration-300 relative group"
@@ -83,13 +90,7 @@ export default function Navbar() {
                    Carreras
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-all group-hover:w-full"></span>
                 </Link>
-                <Link
-                  to="/matches-mutual"
-                  className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 font-medium transition duration-300 relative group"
-                >
-                   Matches
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-all group-hover:w-full"></span>
-                </Link>
+               
                 <Link
                   to="/profile"
                   className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 font-medium transition duration-300 relative group"
