@@ -1,6 +1,7 @@
 // src/services/api.ts
 import axios, { AxiosError } from 'axios';
 import type { GetUsuariosResponse } from '../types/usuario';
+import type { Message } from '../types/messages';
 
 const API = axios.create({
   baseURL: 'http://localhost:3001/api',
@@ -55,3 +56,45 @@ export const getUsuariosConFiltros = async (
   }
 };
 
+
+// Consultar el chat por matchId
+export const getMessagesByMatchId = async (token: string, matchId: number): Promise<Message[]> => {
+  try {
+    const response = await API.get<Message[]>(`/messages/${matchId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    console.error('Error al obtener mensajes:', axiosError.message);
+    throw axiosError;
+  }
+};
+
+
+// Nuevo método para crear mensaje
+export const createMessage = async (
+  token: string,
+  match_id: number,
+  text: string
+): Promise<Message> => {
+  try {
+    const response = await API.post<Message>(
+      '/messages',
+      { match_id, text },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    console.error('Error al crear mensaje:', axiosError.message);
+    throw axiosError;
+  }
+};

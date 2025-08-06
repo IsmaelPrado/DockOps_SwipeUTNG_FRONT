@@ -54,10 +54,10 @@ export default function MatchesMutuos() {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log('Matches recibidos:', res.data);
-        setMatchesMutuos(res.data.data || []);
+        console.log("Matches recibidos:", res.data.data);
+        setMatchesMutuos(res.data.data);
       } catch (error) {
-        console.error('Error al obtener matches mutuos:', error.response?.data || error.message);
+        console.error("Error al obtener matches mutuos:", error.response?.data || error.message);
         setMatchesMutuos([]);
       } finally {
         setLoading(false);
@@ -81,16 +81,18 @@ export default function MatchesMutuos() {
   };
 
   // Filtrado robusto para evitar errores
-  const filteredMatches = matchesMutuos.filter((match) => {
-    const age = parseInt(match.age, 10) || 0; // Parse age directly from match
-    const { career, gender, minAge, maxAge } = filters;
-    return (
-      (career ? match.career === career : true) && // Filter by career
-      (gender ? match.gender === gender : true) && // Filter by gender
-      age >= parseInt(minAge, 10) && // Filter by minimum age
-      age <= parseInt(maxAge, 10) // Filter by maximum age
-    );
-  });
+ const filteredMatches = matchesMutuos.filter(({ user }) => {
+  const age = parseInt(user.age, 10) || 0;
+  const { career, gender, minAge, maxAge } = filters;
+
+  return (
+    (career ? user.career === career : true) &&
+    (gender ? user.gender === gender : true) &&
+    age >= parseInt(minAge, 10) &&
+    age <= parseInt(maxAge, 10)
+  );
+});
+
 
   const getImageUrl = (id) => `https://i.pravatar.cc/600?u=${id}`;
 
@@ -163,33 +165,31 @@ return (
         {/* LISTADO LATERAL */}
         <div>
           <h3 className="font-semibold text-white mb-3">Tus Matches</h3>
-          {filteredMatches.length === 0 ? (
-            <p className="text-sm text-gray-400">No hay matches aún.</p>
-          ) : (
-            <div className="space-y-3">
-              {filteredMatches.map((match) => (
-                <div
-                  key={match.id}
-                  onClick={() => {setSelectedMatch(match); setActiveConversationId(match.id);}}
-                  className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md hover:bg-gray-700 ${
-                    selectedMatch?.id === match.id ? 'bg-gray-600 ring-2 ring-purple-400' : 'bg-gray-800'
-                  }`}
-                >
-                  <img
-                    src={getImageUrl(match.id)}
-                    alt={match.name}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-purple-400"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-white text-sm truncate">{match.name}</p>
-                    <p className="text-xs text-gray-400 truncate">
-                      {match.age} años • {match.career?.split(' ').slice(0, 2).join(' ')}...
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        {filteredMatches.map(({ matchId, user }) => (
+  <div
+    key={matchId}
+    onClick={() => {
+      setSelectedMatch(user);
+      setActiveConversationId(matchId); // <-- quizás aquí también quieras usar matchId
+    }}
+    className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md hover:bg-gray-700 ${
+      selectedMatch?.id === user.id ? 'bg-gray-600 ring-2 ring-purple-400' : 'bg-gray-800'
+    }`}
+  >
+    <img
+      src={getImageUrl(user.id)}
+      alt={user.name}
+      className="w-12 h-12 rounded-full object-cover border-2 border-purple-400"
+    />
+    <div className="flex-1 min-w-0">
+      <p className="font-semibold text-white text-sm truncate">{user.name}</p>
+      <p className="text-xs text-gray-400 truncate">
+        {user.age} años • {user.career?.split(' ').slice(0, 2).join(' ')}...
+      </p>
+    </div>
+  </div>
+))}
+
         </div>
       </div>
 
