@@ -34,7 +34,7 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  const handleVerMas = (carrera) => {
+  const handleVerMas = (carrera: any) => {
     const encodedCarrera = encodeURIComponent(carrera);
     navigate(`/carrera/${encodedCarrera}`);
   };

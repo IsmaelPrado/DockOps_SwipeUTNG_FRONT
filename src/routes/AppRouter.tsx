@@ -1,13 +1,14 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
-import Register from '../pages/Register';
+import MatchesMutuos from '../pages/MatchesMutuos';
 import Dashboard from '../pages/Dashboard';
+import Register from '../pages/Register';
 import Profile from '../pages/Perfil';
-
 import UsuariosPorCarrera from '../pages/UsuariosPorCarrera';
-import MatchesMutuos from '../pages/MatchesMutuos'; // 👈 Importa el nuevo componente
-import TodosLosUsuarios from '../pages/TodosLosUsuarios'; // 👈 Importa el componente TodosLosUsuarios
+import TodosLosUsuarios from '../pages/TodosLosUsuarios';
+
+
 
 const AppRouter = () => {
   console.log('AppRouter cargado');

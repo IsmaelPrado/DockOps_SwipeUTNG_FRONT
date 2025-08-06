@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import { API_URL } from '../services/api';
@@ -15,7 +15,7 @@ export default function Profile() {
     photos: ['', '', ''],
   });
 
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -48,7 +48,7 @@ export default function Profile() {
   );
 
 
-  const handleChange = (e) => {
+  const handleChange = (e:any) => {
     const { name, value, files } = e.target;
     if (name.startsWith('photo-') && files.length > 0) {
       const index = parseInt(name.split('-')[1], 10);
@@ -66,7 +66,7 @@ export default function Profile() {
     }
   };
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async (e:any) => {
   e.preventDefault(); // Prevenir el refresh del formulario
 
   try {
@@ -83,7 +83,6 @@ export default function Profile() {
       throw new Error('Error al actualizar el perfil');
     }
 
-    const updatedUser = await response.json();
     toast.success('Perfil actualizado con éxito');
   } catch (error) {
     toast.error('Ocurrió un error al actualizar tu perfil');
@@ -115,9 +114,9 @@ export default function Profile() {
     "TSU en Energía Turbo Solar"
   ];
 
-  const fileInputRefs = [null, null, null];
-  const triggerFileInput = (index) => {
-    fileInputRefs[index].click();
+const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const triggerFileInput = (index:number) => {
+    fileInputRefs.current[index]?.click();
   };
 
   const profilePhoto = formData.photos[0] || 'https://i.pravatar.cc/400?u=profile';
@@ -246,7 +245,9 @@ export default function Profile() {
                       name={`photo-${index}`}
                       accept="image/*"
                       onChange={handleChange}
-                      ref={(el) => (fileInputRefs[index] = el)}
+                       ref={(el) => {
+          fileInputRefs.current[index] = el;
+        }}
                       className="hidden"
                     />
                   </div>

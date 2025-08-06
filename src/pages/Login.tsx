@@ -7,12 +7,12 @@ import { toast } from 'react-toastify';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(['']);
+  const [error, setError] = useState<string | string[]>('');
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setError('');
@@ -24,14 +24,18 @@ export default function Login() {
       localStorage.setItem('token', res.token);
       toast.success('Inicio de sesión exitoso');
       navigate('/matches-mutual');
-    } catch (err) {
-      console.error('Error al iniciar sesión:', err);
-      const message = err?.response?.data?.message || 'Error al iniciar sesión';
-      const errors = err?.response?.data?.errors || [];
-
-      setError(errors.length > 0 ? errors : message);
-      toast.error(message);
-    } finally {
+    } catch (err: unknown) {
+  if (typeof err === 'object' && err !== null && 'response' in err) {
+    const error = err as { response?: { data?: { message?: string; errors?: string[] } } };
+    const message = error.response?.data?.message || 'Error al iniciar sesión';
+    const errors = error.response?.data?.errors || [];
+    setError(errors.length > 0 ? errors : message);
+    toast.error(message);
+  } else {
+    setError('Error desconocido');
+    toast.error('Error desconocido');
+  }
+} finally {
       setLoading(false);
     }
   };

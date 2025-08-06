@@ -1,6 +1,6 @@
 
 // src/pages/Register.jsx
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { registerUser } from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -47,18 +47,18 @@ export default function Register() {
     "TSU en Energía Turbo Solar"
   ];
 
-  const handleChange = (e) => {
+ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const normalizeGender = (gender) => {
+  const normalizeGender = (gender: string) => {
     const lower = gender.toLowerCase();
     if (['female', 'male', 'other'].includes(lower)) return lower;
     return '';
   };
 
-  const fileToBase64 = (file) => {
+  const fileToBase64 = (file: File) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -67,21 +67,21 @@ export default function Register() {
     });
   };
 
-  const handleFileChange = async (e, index) => {
-    const file = e.target.files[0];
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       const base64 = await fileToBase64(file);
-      const updatedPhotos = [...formData.photos];
-      updatedPhotos[index] = base64;
+      const updatedPhotos: string[] = [...formData.photos];
+      updatedPhotos[index] = base64 as string;
       setFormData({ ...formData, photos: updatedPhotos });
     } catch (err) {
       setError('Error al procesar la imagen. Intenta con otra.');
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -120,7 +120,7 @@ export default function Register() {
       await registerUser(dataToSend);
 
       navigate('/login');
-    } catch (err) {
+    } catch (err: any) {
       setError(
         err?.errors?.[0] ||
         err?.message ||
@@ -133,8 +133,8 @@ export default function Register() {
     }
   };
 
-  const fileInputRefs = [null, null, null];
-  const triggerFileInput = (index) => fileInputRefs[index].click();
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const triggerFileInput = (index: number) => fileInputRefs.current[index]?.click();
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
@@ -227,7 +227,9 @@ export default function Register() {
                     >
                       {formData.photos[index] ? 'Cambiar' : 'Subir'}
                     </motion.button>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, index)} ref={(el) => (fileInputRefs[index] = el)} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, index)} ref={(el) => {
+  fileInputRefs.current[index] = el;
+}}className="hidden" />
                   </div>
                 ))}
               </div>

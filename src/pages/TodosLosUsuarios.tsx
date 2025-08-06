@@ -2,10 +2,16 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 
+type Usuario = {
+  id: number;
+  name: string;
+  age: number;
+};
+
 export default function TodosLosUsuarios() {
-  const [usuarios, setUsuarios] = useState([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [filters, setFilters] = useState({
     career: '',
     gender: '',
@@ -71,7 +77,7 @@ export default function TodosLosUsuarios() {
     fetchUsuarios();
   }, []);
 
-  const handleMatch = async (matchedUserId) => {
+  const handleMatch = async (matchedUserId: number) => {
     if (!currentUserId) {
       alert('Debes estar logueado para hacer match');
       return;
@@ -96,7 +102,7 @@ export default function TodosLosUsuarios() {
     }
   };
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -105,8 +111,8 @@ export default function TodosLosUsuarios() {
   };
 
   const filteredUsers = usuarios
-    .filter((user) => user.id !== currentUserId)
-    .filter((user) => {
+    .filter((user: any) => user.id !== currentUserId)
+    .filter((user: any) => {
       const age = user.age;
       const { career, gender, minAge, maxAge } = filters;
       return (
@@ -199,7 +205,7 @@ export default function TodosLosUsuarios() {
             <p className="text-center text-gray-500 text-xl">No hay usuarios registrados.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              {filteredUsers.map((user) => (
+              {filteredUsers.map((user: any) => (
                 <div
                   key={user.id}
                   className="bg-zinc-800 rounded-xl p-6 shadow-lg hover:scale-105 transition-transform duration-300 relative"
