@@ -7,15 +7,16 @@ import { createMessage, getMessagesByMatchId } from '../services/api';
 type ChatModalProps = {
   conversationId: number;
   onClose: () => void;
+  chatUserName: string; // Nombre del usuario con quien se chatea
 };
 
-const ChatModal = ({ conversationId, onClose }: ChatModalProps) => {
+const ChatModal = ({ conversationId, onClose, chatUserName }: ChatModalProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
 
-  // Decodificar token para obtener el ID del usuario
+  // Decodificar token para obtener el ID del usuario actual
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -37,7 +38,6 @@ const ChatModal = ({ conversationId, onClose }: ChatModalProps) => {
         if (!token) return;
 
         const messagesFromApi = await getMessagesByMatchId(token, conversationId);
-        console.log('Mensajes obtenidos:', messagesFromApi);
         setMessages(messagesFromApi);
       } catch (err) {
         console.error('Error cargando mensajes:', err);
@@ -47,38 +47,37 @@ const ChatModal = ({ conversationId, onClose }: ChatModalProps) => {
     fetchMessages();
   }, [conversationId]);
 
+  // Scroll hacia el final cada vez que cambian los mensajes
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSendMessage = async () => {
-  if (!newMessage.trim() || userId === null) return;
+    if (!newMessage.trim() || userId === null) return;
 
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
-    // 1. Crear mensaje en backend
-    await createMessage(token, conversationId, newMessage);
+      // Crear mensaje en backend
+      await createMessage(token, conversationId, newMessage);
 
-    // 2. Limpiar input
-    setNewMessage('');
+      // Limpiar input
+      setNewMessage('');
 
-    // 3. Volver a cargar mensajes actualizados desde backend
-    const updatedMessages = await getMessagesByMatchId(token, conversationId);
-    setMessages(updatedMessages);
-
-  } catch (error) {
-    console.error('Error al enviar mensaje:', error);
-  }
-};
-
+      // Recargar mensajes actualizados desde backend
+      const updatedMessages = await getMessagesByMatchId(token, conversationId);
+      setMessages(updatedMessages);
+    } catch (error) {
+      console.error('Error al enviar mensaje:', error);
+    }
+  };
 
   return (
     <div className="fixed bottom-4 right-4 w-96 max-h-[85vh] bg-gray-900 text-white rounded-xl shadow-lg border border-purple-500 flex flex-col z-50">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-gray-800 rounded-t-xl border-b border-gray-700">
-        <h2 className="font-semibold text-sm">Chat</h2>
+        <h2 className="font-semibold text-sm">{chatUserName}</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-white">
           <X size={18} />
         </button>
@@ -102,7 +101,7 @@ const ChatModal = ({ conversationId, onClose }: ChatModalProps) => {
                   : 'bg-gray-700 self-start mr-auto text-left'
               }`}
             >
-              <span className="text-xs font-semibold text-white">{msg.sender?.name || 'Desconocido'}</span>
+              {/* Solo mensaje y hora, sin nombre */}
               <span className="text-sm text-white">{msg.text}</span>
               <span className="text-xs text-gray-300 mt-1">{time}</span>
             </div>

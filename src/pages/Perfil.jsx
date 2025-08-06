@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import { API_URL } from '../services/api';
+import { toast } from "react-toastify";
 
 export default function Profile() {
   const token = localStorage.getItem('token');
@@ -65,12 +66,30 @@ export default function Profile() {
     }
   };
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    localStorage.setItem('user', JSON.stringify(formData));
+  const handleUpdate = async (e) => {
+  e.preventDefault(); // Prevenir el refresh del formulario
 
-    alert('✅ Perfil actualizado con éxito');
-  };
+  try {
+    const response = await fetch(`${API_URL}/usuarios/me`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al actualizar el perfil');
+    }
+
+    const updatedUser = await response.json();
+    toast.success('Perfil actualizado con éxito');
+  } catch (error) {
+    toast.error('Ocurrió un error al actualizar tu perfil');
+  }
+};
+
 
   const carrerasOptions = [
     "Licenciatura en Administración",
