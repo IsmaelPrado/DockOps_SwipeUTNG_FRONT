@@ -4,11 +4,11 @@ import type { GetUsuariosResponse } from '../types/usuario';
 import type { Message } from '../types/messages';
 
 const API = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: 'https://swipeutng-backend-5a5cztn7ma-uc.a.run.app/api',
 });
 
 // Exportar URL
-export const API_URL = 'http://localhost:3001/api';
+export const API_URL = 'https://swipeutng-backend-5a5cztn7ma-uc.a.run.app/api';
 
 export const registerUser = async (userData: any) => {
   try {

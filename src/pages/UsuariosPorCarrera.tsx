@@ -1,24 +1,32 @@
 // src/pages/UsuariosPorCarrera.jsx
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
-import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../services/api';
 import { toast } from 'react-toastify';
 
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  career: string;
+  age: number;
+  bio?: string;
+};
+
 export default function UsuariosPorCarrera() {
   const { nombreCarrera } = useParams();
-  const decodedCarrera = decodeURIComponent(nombreCarrera);
-  const [usuarios, setUsuarios] = useState([]);
+  const decodedCarrera: string = decodeURIComponent(nombreCarrera? nombreCarrera : '');
+  const [usuarios, setUsuarios] = useState<User[]>([]);
   const [loadingUsuarios, setLoadingUsuarios] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   // Matches mutuos para barra lateral
-  const [matchesMutuos, setMatchesMutuos] = useState([]);
+  const [matchesMutuos, setMatchesMutuos] = useState<User[]>([]);
   const [loadingMatches, setLoadingMatches] = useState(true);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Filtros
   const [filters, setFilters] = useState({
@@ -27,7 +35,6 @@ export default function UsuariosPorCarrera() {
     maxAge: 35,
   });
 
-  const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
   // Obtener usuario actual
@@ -61,7 +68,7 @@ export default function UsuariosPorCarrera() {
           }
         );
         setUsuarios(Array.isArray(response.data) ? response.data : []);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error al obtener usuarios:', error.response?.data || error.message);
         setUsuarios([]);
       } finally {
@@ -90,7 +97,7 @@ export default function UsuariosPorCarrera() {
           }
         });
         setMatchesMutuos(res.data.data || []);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error al obtener matches mutuos:', error.response?.data || error.message);
         setMatchesMutuos([]);
       } finally {
@@ -101,7 +108,7 @@ export default function UsuariosPorCarrera() {
     fetchMutualMatches();
   }, [token]);
 
-  const handleMatch = async (matchedUserId) => {
+  const handleMatch = async (matchedUserId: number) => {
     if (!token) {
       toast.error('Debes iniciar sesión para hacer match.');
       return;
@@ -122,7 +129,7 @@ export default function UsuariosPorCarrera() {
       );
       toast.success('✅ ¡Match enviado! Espera a que también te matcheen.');
       // Opcional: remover del listado o actualizar estado
-      setUsuarios(prev => prev.filter(u => u.id !== matchedUserId));
+      setUsuarios(prev => prev.filter((u: any) => u.id !== matchedUserId));
       setSelectedUser(null);
     } catch (error) {
       console.error('Error al hacer match:', error);
@@ -130,11 +137,8 @@ export default function UsuariosPorCarrera() {
     }
   };
 
-  const handleIniciarChat = (matchedUserId) => {
-    navigate(`/chat/${matchedUserId}`);
-  };
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters((prev) => ({
       ...prev,
@@ -143,18 +147,18 @@ export default function UsuariosPorCarrera() {
   };
 
   // Filtrar usuarios
-  const filteredUsers = usuarios
-    .filter((user) => user.id !== currentUserId)
-    .filter((user) => {
+  const filteredUsers: any[] = usuarios
+    .filter((user: any) => user.id !== currentUserId)
+    .filter((user: any) => {
       const age = parseInt(user.age, 10) || 0;
       return (
         (!filters.gender || user.gender === filters.gender) &&
-        age >= parseInt(filters.minAge, 10) &&
-        age <= parseInt(filters.maxAge, 10)
+        age >= filters.minAge &&
+        age <= filters.maxAge
       );
     });
 
-  const getImageUrl = (id) => `https://i.pravatar.cc/600?u=${id}`;
+  const getImageUrl = (id: number) => `https://i.pravatar.cc/600?u=${id}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-gray-100">
@@ -219,7 +223,7 @@ export default function UsuariosPorCarrera() {
             <p className="text-sm text-gray-400">No tienes matches mutuos aún.</p>
           ) : (
             <div className="space-y-3">
-              {matchesMutuos.map((match) => (
+              {matchesMutuos.map((match: any) => (
                 <div
                   key={match.id}
                   onClick={() => setSelectedUser(match)}
@@ -301,7 +305,7 @@ export default function UsuariosPorCarrera() {
           ) : (
             /* Cuadrícula de usuarios */
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {filteredUsers.map((user) => (
+              {filteredUsers.map((user: any) => (
                 <motion.div
                   key={user.id}
                   initial={{ opacity: 0, scale: 0.95 }}
