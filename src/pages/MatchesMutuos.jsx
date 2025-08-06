@@ -177,7 +177,7 @@ return (
     }`}
   >
     <img
-      src={getImageUrl(user.id)}
+      src={user.photos}
       alt={user.name}
       className="w-12 h-12 rounded-full object-cover border-2 border-purple-400"
     />
@@ -203,6 +203,7 @@ return (
         <ChatModal
           conversationId={activeConversationId}
           onClose={() => setActiveConversationId(null)}
+          chatUserName={selectedMatch?.name || ''}
         />
       )}
     </div>
