@@ -98,3 +98,29 @@ export const createMessage = async (
     throw axiosError;
   }
 };
+
+
+export const createSwipe = async (
+  token: string,
+  swiper_id: number,
+  swiped_id: number,
+  is_like: boolean): Promise<{ success: boolean; message?: string }> => {
+  try {
+    const response = await API.post('/swipe', {
+      swiper_id,
+      swiped_id,
+      is_like,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    console.error('Error al crear swipe:', axiosError.message);
+    throw axiosError.response?.data || { message: 'Error al crear swipe' };
+  }
+  }
